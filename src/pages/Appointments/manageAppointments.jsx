@@ -12,53 +12,18 @@ const Alert = lazy(() => import("../../components/Alerts"));
 const Header = lazy(() => import("../../components/DonorHeader"));
 const Button = lazy(() => import("../../components/Button"));
 const Modal = lazy(() => import("../../components/Modal"));
-const Input = lazy(() => import("../../components/Input"));
 
 const ManageAppointments = () => {
   const [appointment, setAppointment] = useState([]);
   const [isModal1Active, setIsModal1Active] = useState(false);
-  const [isModal2Active, setIsModal2Active] = useState(false);
   const { id } = useParams();
-  const [times, setTimes] = useState([]);
   const [loading, setLoading] = useState(true); // State to handle loading
   const navigate = useNavigate();
   const user = JSON.parse(useContext(AuthContext));
-  const [minDate, setMinDate] = useState("");
-  const [selectedTime, setSelectedTime] = useState(""); // State to hold the selected time
-  const [centre, setCentre] = useState({});
 
-  // Set the minimum date to today
-  const setMinDateHandler = () => {
-    const minimum = new Date(Date.now()).toISOString().split("T")[0];
-    setMinDate(minimum);
-  };
   const date = new Date(appointment.Date);
   const time = new Date(appointment.Time);
   const location = appointment.Donation_Centre;
-
-  // Fetches available times for the selected date and centre
-  const getTimes = async () => {
-    if (date && centre.ID) {
-      try {
-        const response = await getAvailableTimes(date, centre.ID);
-        setTimes(response);
-      } catch (error) {
-        console.error("Failed to fetch available times:", error);
-        setTimes([]);
-      }
-    }
-  };
-
- // Fetches centre details based on ID
-  const getPlace = async () => {
-    try {
-      const centre = await getCentre(id);
-      setCentre(centre);
-    } catch (error) {
-      console.error("Failed to fetch centre:", error);
-    }
-  };
-
 
   const getThisAppointment = async () => {
     try {
@@ -72,22 +37,8 @@ const ManageAppointments = () => {
   };
   const onClick = async () => {
     await cancelAppointment(user.token, id);
+    navigate("/")
   };
-  const onChange = (e) => {
-    const selectedDate = e.target.value;
-    setDate(selectedDate + "T00:00:00Z");
-  };
-
-  // Handle time selection
-  const handleTimeSelect = (time) => {
-    setSelectedTime(time);
-  };
-
-  // Fetch times whenever the date or centre changes
-  useEffect(() => {
-    getTimes();
-    setMinDateHandler();
-  }, [date, centre.ID]);
 
   useEffect(() => {
     if (!user) {
@@ -138,11 +89,6 @@ const ManageAppointments = () => {
             </h2>
             <div className="flex flex-col items-center px-48 gap-12 ">
               <Button
-                children="Reschedule this appointment"
-                className="text-white text-center justify-center font-heading w-[30rem] text-xl py-5"
-              />
-
-              <Button
                 onClick={() => {
                   setIsModal1Active(true);
                 }}
@@ -159,12 +105,6 @@ const ManageAppointments = () => {
                   is irreversible
                 </h1>
               </Modal>
-
-              <Modal
-                active={isModal2Active}
-                setActive={setIsModal1Active}
-                onClick={onClick}
-              ></Modal>
             </div>
           </div>
         </div>

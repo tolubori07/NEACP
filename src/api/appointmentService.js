@@ -121,14 +121,16 @@ export const getAppointment = async (token, ID) => {
 
 export const cancelAppointment = async (token, id) => {
   try {
-    console.log(id)
+    console.log(id);
     if (!token || !id) throw new Error("Missing required parameters");
     /*const config = {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     };*/
-    const response = await axios.delete(`${url}/cancelappointment?id=${id}`, /*config*/);
+    const response = await axios.delete(
+      `${url}/cancelappointment?id=${id}` /*config*/,
+    );
     return response.data;
   } catch (error) {
     console.error(error);
